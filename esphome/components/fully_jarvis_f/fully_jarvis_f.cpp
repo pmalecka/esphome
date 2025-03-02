@@ -116,7 +116,7 @@ void FullyJarvisFComponent::reset_all_sensors_() {
 #endif
 #ifdef USE_NUMBER
   this->height_number_->publish_state(NAN);
-  // this->offset_number_->publish_state(NAN);
+  this->offset_number_->publish_state(NAN);
 #endif
 }
 
@@ -168,8 +168,10 @@ bool FullyJarvisFComponent::is_initialized_() {
     return false;
 #endif
 #ifdef USE_NUMBER
-  bool numbers_initialization_successful =
-      !std::isnan(this->height_number_->state);  // && !std::isnan(this->offset_number_->state);
+  bool numbers_initialization_successful = !std::isnan(
+      this->height_number_
+          ->state);  // && !std::isnan(this->offset_number_->state); // offset is not
+                     // retrieved from the desk (at least not for now, as I don't know which message carries the value)
   if (!numbers_initialization_successful)
     return false;
 #endif

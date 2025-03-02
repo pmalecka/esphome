@@ -52,4 +52,4 @@ async def to_code(config):
         # theoretically, max value is 65535, but it doesn't make much sense.. (and I didn't test it)
         n = await number.new_number(offset_config, min_value=0, max_value=1000, step=1)
         await cg.register_parented(n, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_height_number(n))
+        cg.add(fully_jarvis_f_component.set_offset_number(n))
