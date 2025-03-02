@@ -59,7 +59,7 @@ async def to_code(config):
     if kill_mode_config := config.get(CONF_KILL_MODE):
         s = await select.new_select(kill_mode_config, options=["kill", "letlive"])
         await cg.register_parented(s, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_light_function_select(s))
+        cg.add(fully_jarvis_f_component.set_kill_mode_select(s))
     if sensitivity_config := config.get(CONF_SENSITIVITY):
         s = await select.new_select(
             sensitivity_config,
