@@ -27,6 +27,9 @@ std::string array2String(uint8_t *packet, size_t packetSize) {
   return result;
 }
 
+FullyJarvisFMessage::FullyJarvisFMessage()
+    : mStateMachineState(StateMachineState::Start), mSourceId(SourceType::Incoming) {}
+
 FullyJarvisFMessage::FullyJarvisFMessage(SourceType messageSource = SourceType::Incoming)
     : mStateMachineState(StateMachineState::Start), mSourceId(messageSource) {}
 
