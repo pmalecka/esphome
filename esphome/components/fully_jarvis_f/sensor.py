@@ -16,9 +16,9 @@ DEPENDENCIES = ["fully_jarvis_f"]
 # TODO: add validation to ensur sys_limit_min (sensor) and units (select) is also defined, if these preset_x_height
 #       sensors are defined, as the calculation of the preset_x_height value depends on these two
 CONF_PRESET_1_HEIGHT = "preset_1_height"
-CONF_PRESET_2_HEIGHT = "preset_1_height"
-CONF_PRESET_3_HEIGHT = "preset_1_height"
-CONF_PRESET_4_HEIGHT = "preset_1_height"
+CONF_PRESET_2_HEIGHT = "preset_2_height"
+CONF_PRESET_3_HEIGHT = "preset_3_height"
+CONF_PRESET_4_HEIGHT = "preset_4_height"
 
 CONF_USER_LIMIT_MIN_HEIGHT = "user_limit_min_height"
 CONF_USER_LIMIT_MAX_HEIGHT = "user_limit_max_height"
