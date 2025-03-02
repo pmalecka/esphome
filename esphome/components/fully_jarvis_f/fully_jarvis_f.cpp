@@ -21,14 +21,20 @@ void FullyJarvisFComponent::dump_config() {
   LOG_BINARY_SENSOR("  ", "InitializedBinarySensor", this->initialized_binary_sensor_);
 #endif
 #ifdef USE_BUTTON
-  LOG_BUTTON("  ", "GoPreset1Button", this->go_preset_1_button_);
-  LOG_BUTTON("  ", "GoPreset2Button", this->go_preset_2_button_);
-  LOG_BUTTON("  ", "GoPreset3Button", this->go_preset_3_button_);
-  LOG_BUTTON("  ", "GoPreset4Button", this->go_preset_4_button_);
-  LOG_BUTTON("  ", "SetPreset1Button", this->set_preset_1_button_);
-  LOG_BUTTON("  ", "SetPreset2Button", this->set_preset_2_button_);
-  LOG_BUTTON("  ", "SetPreset3Button", this->set_preset_3_button_);
-  LOG_BUTTON("  ", "SetPreset4Button", this->set_preset_4_button_);
+  for (size_t i = 0; button::Button * b : this->go_preset_buttons_) {
+    LOG_BUTTON("  ", ("GoPresetButton" + std::to_string(++i)).c_str(), b);
+  }
+  for (size_t i = 0; button::Button * b : this->set_preset_buttons_) {
+    LOG_BUTTON("  ", ("SetPresetButton" + std::to_string(++i)).c_str(), b);
+  }
+  // LOG_BUTTON("  ", "GoPreset1Button", this->go_preset_1_button_);
+  // LOG_BUTTON("  ", "GoPreset2Button", this->go_preset_2_button_);
+  // LOG_BUTTON("  ", "GoPreset3Button", this->go_preset_3_button_);
+  // LOG_BUTTON("  ", "GoPreset4Button", this->go_preset_4_button_);
+  // LOG_BUTTON("  ", "SetPreset1Button", this->set_preset_1_button_);
+  // LOG_BUTTON("  ", "SetPreset2Button", this->set_preset_2_button_);
+  // LOG_BUTTON("  ", "SetPreset3Button", this->set_preset_3_button_);
+  // LOG_BUTTON("  ", "SetPreset4Button", this->set_preset_4_button_);
 
   LOG_BUTTON("  ", "SetMaxHeightButton", this->set_max_height_button_);
   LOG_BUTTON("  ", "SetMinHeightButton", this->set_min_height_button_);
@@ -577,6 +583,15 @@ float FullyJarvisFComponent::preset_val_to_height_(uint16_t raw) {
   float height_mm = sys_limit + round((float) (raw - 0x13F5) * 0.0642f);
   return units == "inch" ? round((float) height_mm * 0.393f) : round((float) height_mm);
 }
+
+#ifdef USE_BUTTON
+void FullyJarvisFComponent::set_go_preset_button(uint8_t preset, button::Button *b) {
+  this->go_preset_buttons_[preset] = b;
+}
+void FullyJarvisFComponent::set_set_preset_button(uint8_t preset, button::Button *b) {
+  this->set_preset_buttons_[preset] = b;
+}
+#endif
 
 }  // namespace fully_jarvis_f
 }  // namespace esphome

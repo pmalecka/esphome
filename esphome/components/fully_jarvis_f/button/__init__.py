@@ -2,6 +2,7 @@ import esphome.codegen as cg
 from esphome.components import button
 import esphome.config_validation as cv
 from esphome.const import (
+    CONF_ID,
     DEVICE_CLASS_RESTART,
     DEVICE_CLASS_UPDATE,
     ENTITY_CATEGORY_CONFIG,
@@ -111,56 +112,61 @@ CONFIG_SCHEMA = {
 
 async def to_code(config):
     fully_jarvis_f_component = await cg.get_variable(config[CONF_FULLY_JARVIS_F_ID])
-    # TODO: test this.. not sure if I got it right..
-    if go_preset_1_config := config.get(CONF_GO_PRESET_1):
-        preset_num = 1
-        b = cg.new_Pvariable(go_preset_1_config, preset_num)
-        await button.register_button(b, go_preset_1_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    if go_preset_2_config := config.get(CONF_GO_PRESET_2):
-        preset_num = 2
-        b = cg.new_Pvariable(go_preset_2_config, preset_num)
-        await button.register_button(b, go_preset_2_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    if go_preset_3_config := config.get(CONF_GO_PRESET_3):
-        preset_num = 3
-        b = cg.new_Pvariable(go_preset_3_config, preset_num)
-        await button.register_button(b, go_preset_3_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    if go_preset_4_config := config.get(CONF_GO_PRESET_4):
-        preset_num = 4
-        b = cg.new_Pvariable(go_preset_4_config, preset_num)
-        await button.register_button(b, go_preset_4_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
+    for x in range(4):
+        preset_num = x + 1
+        if go_preset_n_config := config.get(f"go_preset_{preset_num}"):
+            b = cg.new_Pvariable(go_preset_n_config[CONF_ID], preset_num)
+            await button.register_button(b, go_preset_n_config)
+            await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+            cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
 
-    if set_preset_1_config := config.get(CONF_SET_PRESET_1):
-        preset_num = 1
-        b = cg.new_Pvariable(set_preset_1_config, preset_num)
-        await button.register_button(b, set_preset_1_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    if set_preset_2_config := config.get(CONF_SET_PRESET_2):
-        preset_num = 2
-        b = cg.new_Pvariable(set_preset_2_config, preset_num)
-        await button.register_button(b, set_preset_2_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    if set_preset_3_config := config.get(CONF_SET_PRESET_3):
-        preset_num = 3
-        b = cg.new_Pvariable(set_preset_3_config, preset_num)
-        await button.register_button(b, set_preset_3_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    if set_preset_4_config := config.get(CONF_SET_PRESET_4):
-        preset_num = 4
-        b = cg.new_Pvariable(set_preset_4_config, preset_num)
-        await button.register_button(b, set_preset_4_config)
-        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-        cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
+        if set_preset_n_config := config.get(f"set_preset_{preset_num}"):
+            b = cg.new_Pvariable(set_preset_n_config[CONF_ID], preset_num)
+            await button.register_button(b, set_preset_n_config)
+            await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+            cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
+
+    # if go_preset_1_config := config.get(CONF_GO_PRESET_1):
+    #     preset_num = 1
+    #     b = await button.new_button(go_preset_1_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
+    # if go_preset_2_config := config.get(CONF_GO_PRESET_2):
+    #     preset_num = 2
+    #     b = await button.new_button(go_preset_2_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
+    # if go_preset_3_config := config.get(CONF_GO_PRESET_3):
+    #     preset_num = 3
+    #     b = await button.new_button(go_preset_3_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
+    # if go_preset_4_config := config.get(CONF_GO_PRESET_4):
+    #     preset_num = 4
+    #     b = await button.new_button(go_preset_4_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
+
+    # if set_preset_1_config := config.get(CONF_SET_PRESET_1):
+    #     preset_num = 1
+    #     b = await button.new_button(set_preset_1_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
+    # if set_preset_2_config := config.get(CONF_SET_PRESET_2):
+    #     preset_num = 2
+    #     b = await button.new_button(set_preset_2_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
+    # if set_preset_3_config := config.get(CONF_SET_PRESET_3):
+    #     preset_num = 3
+    #     b = await button.new_button(set_preset_3_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
+    # if set_preset_4_config := config.get(CONF_SET_PRESET_4):
+    #     preset_num = 4
+    #     b = await button.new_button(set_preset_4_config)
+    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
 
     if set_max_height_config := config.get(CONF_SET_MAX_HEIGHT):
         b = await button.new_button(set_max_height_config)

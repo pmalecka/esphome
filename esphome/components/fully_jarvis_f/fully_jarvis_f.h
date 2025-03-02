@@ -118,10 +118,10 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   SUB_SELECT(sensitivity)
 #endif
 #ifdef USE_BUTTON
-  SUB_BUTTON(go_preset_1)
-  SUB_BUTTON(go_preset_2)
-  SUB_BUTTON(go_preset_3)
-  SUB_BUTTON(go_preset_4)
+  // SUB_BUTTON(go_preset_1)
+  // SUB_BUTTON(go_preset_2)
+  // SUB_BUTTON(go_preset_3)
+  // SUB_BUTTON(go_preset_4)
   SUB_BUTTON(set_preset_1)
   SUB_BUTTON(set_preset_2)
   SUB_BUTTON(set_preset_3)
@@ -141,7 +141,6 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   void setup() override;
   void dump_config() override;
   void loop() override;
-  void set_light_out_control();
 #ifdef USE_NUMBER
   void set_height(uint16_t height);
   void set_offset(uint16_t offset);
@@ -153,13 +152,17 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   void set_kill_mode(const std::string &state);
   void set_sensitivity(const std::string &state);
 #endif
+#ifdef USE_BUTTON
   // buttons
+  void set_go_preset_button(uint8_t preset, button::Button *b);
+  void set_set_preset_button(uint8_t preset, button::Button *b);
   void go_preset(uint8_t preset);
   void set_preset(uint8_t preset);
   void set_max_height();
   void set_min_height();
   void clear_max_height();
   void clear_min_height();
+#endif
 
  protected:
   void send_command_(const FullyJarvisFMessage &msg, uint8_t reps);
@@ -178,6 +181,10 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 
   uint16_t last_reported_height_;
   uint8_t fail_counter_ = 0;
+#ifdef USE_BUTTON
+  std::vector<button::Button *> go_preset_buttons_ = std::vector<button::Button *>(4);
+  std::vector<button::Button *> set_preset_buttons_ = std::vector<button::Button *>(4);
+#endif
 };
 
 }  // namespace fully_jarvis_f
