@@ -197,7 +197,7 @@ void FullyJarvisFComponent::loop() {
 
   if (isValid) {
     ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
-    ESP_LOGV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
+    ESP_LOGVV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
     this->handle_incoming_data_(incomingMsg);
   }
 }
@@ -211,71 +211,94 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       uint16_t preset_1_raw = msg.getParam<uint16_t>();
       ESP_LOGD(TAG, "preset_1_raw %u", (unsigned int) preset_1_raw);
       float preset_height = preset_val_to_height_(preset_1_raw);
-      if (!std::isnan(preset_height))
+      if (!std::isnan(preset_height)) {
         this->preset_1_height_sensor_->publish_state(preset_height);
+        ESP_LOGV(TAG, "Setting Preset_1 to: %f", preset_height);
+      } else {
+        ESP_LOGV(TAG, "Cannot set preset_1 yet. units: %s, sys_limit_min_height: %f",
+                 this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
+      }
       break;
     }
     case IncomingCommandType::LocPreset2: {
       uint16_t preset_2_raw = msg.getParam<uint16_t>();
       ESP_LOGD(TAG, "preset_2_raw %u", (unsigned int) preset_2_raw);
       float preset_height = preset_val_to_height_(preset_2_raw);
-      if (!std::isnan(preset_height))
+      if (!std::isnan(preset_height)) {
         this->preset_2_height_sensor_->publish_state(preset_height);
+        ESP_LOGV(TAG, "Setting Preset_2 to: %f", preset_height);
+      } else {
+        ESP_LOGV(TAG, "Cannot set preset_2 yet. units: %s, sys_limit_min_height: %f",
+                 this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
+      }
       break;
     }
     case IncomingCommandType::LocPreset3: {
       uint16_t preset_3_raw = msg.getParam<uint16_t>();
       ESP_LOGD(TAG, "preset_3_raw %u", (unsigned int) preset_3_raw);
       float preset_height = preset_val_to_height_(preset_3_raw);
-      if (!std::isnan(preset_height))
+      if (!std::isnan(preset_height)) {
         this->preset_3_height_sensor_->publish_state(preset_height);
+        ESP_LOGV(TAG, "Setting Preset_3 to: %f", preset_height);
+      } else {
+        ESP_LOGV(TAG, "Cannot set preset_3 yet. units: %s, sys_limit_min_height: %f",
+                 this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
+      }
       break;
     }
     case IncomingCommandType::LocPreset4: {
       uint16_t preset_4_raw = msg.getParam<uint16_t>();
       ESP_LOGD(TAG, "preset_4_raw %u", (unsigned int) preset_4_raw);
       float preset_height = preset_val_to_height_(preset_4_raw);
-      if (!std::isnan(preset_height))
+      if (!std::isnan(preset_height)) {
         this->preset_4_height_sensor_->publish_state(preset_height);
+        ESP_LOGV(TAG, "Setting Preset_4 to: %f", preset_height);
+      } else {
+        ESP_LOGV(TAG, "Cannot set preset_4 yet. units: %s, sys_limit_min_height: %f",
+                 this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
+      }
       break;
     }
     case IncomingCommandType::Units: {
       std::string units = UNITS_INT_TO_ENUM.at(msg.getParam<UnitsStructure>());
       this->units_select_->publish_state(units);
-      ESP_LOGI(TAG, "Units: %s", units);
+      ESP_LOGV(TAG, "Setting units to: %s", units.c_str());
       break;
     }
     case IncomingCommandType::TouchMode: {
       std::string touch_mode = TOUCH_MODE_INT_TO_ENUM.at(msg.getParam<TouchModeStructure>());
       this->touch_mode_select_->publish_state(touch_mode);
-      ESP_LOGI(TAG, "Touch mode: %s", touch_mode);
+      ESP_LOGV(TAG, "Setting touch_mode to: %s", touch_mode.c_str());
       break;
     }
     case IncomingCommandType::KillMode: {
       std::string kill_mode = KILL_MODE_INT_TO_ENUM.at(msg.getParam<KillModeStructure>());
       this->kill_mode_select_->publish_state(kill_mode);
-      ESP_LOGI(TAG, "Kill mode: %s", kill_mode);
+      ESP_LOGV(TAG, "Setting kill_mode to: %s", kill_mode.c_str());
       break;
     }
     case IncomingCommandType::Sensitivity: {
       std::string sensitivity = SENSITIVITY_INT_TO_ENUM.at(msg.getParam<SensitivityStructure>());
       this->sensitivity_select_->publish_state(sensitivity);
-      ESP_LOGI(TAG, "Sensitivity: %s", sensitivity);
+      ESP_LOGV(TAG, "Setting sensitivity to: %s", sensitivity.c_str());
       break;
     }
     case IncomingCommandType::MinMaxSet: {
       std::string user_limit_set = USER_LIMIT_SET_INT_TO_ENUM.at(msg.getParam<UserLimitSetStructure>());
       this->user_limit_set_text_sensor_->publish_state(user_limit_set);
+      ESP_LOGV(TAG, "Setting user_limit_set to: %s", user_limit_set.c_str());
       break;
     }
     case IncomingCommandType::MinHeight: {
       uint16_t user_limit_min = msg.getParam<uint16_t>();
       this->user_limit_min_height_sensor_->publish_state(user_limit_min);
+      ESP_LOGV(TAG, "Setting user_limit_min to: %d", user_limit_min);
       break;
     }
     case IncomingCommandType::MaxHeight: {
       uint16_t user_limit_max = msg.getParam<uint16_t>();
       this->user_limit_max_height_sensor_->publish_state(user_limit_max);
+      ESP_LOGV(TAG, "Setting user_limit_max to: %d", user_limit_max);
       break;
     }
     case IncomingCommandType::AbsLimits: {
@@ -289,6 +312,8 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
 
       this->sys_limit_max_height_sensor_->publish_state(sys_limit_max);
       this->sys_limit_min_height_sensor_->publish_state(sys_limit_min);
+      ESP_LOGV(TAG, "Setting sys_limit_max to: %d", sys_limit_max);
+      ESP_LOGV(TAG, "Setting sys_limit_min to: %d", sys_limit_min);
       break;
     }
     case IncomingCommandType::Height: {
@@ -296,6 +321,7 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       if (this->height_number_ != nullptr &&
           (!this->height_number_->has_state() || this->height_number_->state != this->last_reported_height_)) {
         this->height_number_->publish_state(this->last_reported_height_);
+        ESP_LOGV(TAG, "Setting height to: %d", this->last_reported_height_);
       }
       break;
     }
@@ -309,13 +335,14 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       (!this->initialized_binary_sensor_->has_state() ||
        this->initialized_binary_sensor_->state != initialization_successful)) {
     this->initialized_binary_sensor_->publish_state(initialization_successful);
+    ESP_LOGV(TAG, "Setting initialized to: %d", initialization_successful);
   }
 #endif
 }
 
 void FullyJarvisFComponent::send_command_(const FullyJarvisFMessage &msg, uint8_t reps = 1) {
   ESP_LOGI(TAG, "Sending COMMAND: %s (%02x)", msg.getTypeStr().c_str(), msg.getType());
-  ESP_LOGV(TAG, "Sending COMMAND %s", msg.toString().c_str());
+  ESP_LOGVV(TAG, "Sending COMMAND %s", msg.toString().c_str());
 
   // if (msg == nullptr) {
   //   ESP_LOGE(TAG, "Error: Message is null");
