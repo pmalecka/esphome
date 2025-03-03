@@ -118,9 +118,9 @@ void FullyJarvisFComponent::read_all_info() {
 
   this->reset_all_sensors_();
 
+  this->get_abs_limits_();      // gets sys_limit_min, sys_limit_max
   this->get_basic_settings_();  // gets units, kill_mode, touch_mode, sensitivity
   this->get_settings_();        // gets height, preset_1_height, preset_2_height, preset_3_height, preset4_height
-  this->get_abs_limits_();      // gets sys_limit_min, sys_limit_max
   this->get_user_limits_();     // gets user_limit_set, user_limit_min, user_limit_max (if set)
 
   // set a timeout for getting all these settings ~ we had 630 ms in our old code, let's round up to 800ms
