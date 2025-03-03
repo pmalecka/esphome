@@ -124,7 +124,7 @@ void FullyJarvisFComponent::read_all_info() {
   this->get_user_limits_();     // gets user_limit_set, user_limit_min, user_limit_max (if set)
 
   // set a timeout for getting all these settings ~ we had 630 ms in our old code, let's round up to 800ms
-  this->set_timeout("ensure_settings_initialized_", 800, [this]() { this->ensure_settings_initialized_(); });
+  this->set_timeout("ensure_settings_initialized_", 1800, [this]() { this->ensure_settings_initialized_(); });
 }
 
 bool FullyJarvisFComponent::is_initialized_() {
