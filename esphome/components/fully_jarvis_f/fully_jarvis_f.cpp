@@ -21,21 +21,12 @@ void FullyJarvisFComponent::dump_config() {
   LOG_BINARY_SENSOR("  ", "InitializedBinarySensor", this->initialized_binary_sensor_);
 #endif
 #ifdef USE_BUTTON
-  for (size_t i = 0; button::Button * b : this->go_preset_buttons_) {
-    LOG_BUTTON("  ", ("GoPresetButton" + std::to_string(++i)).c_str(), b);
+  for (size_t i = 1; button::Button * b : this->go_preset_buttons_) {
+    LOG_BUTTON("  ", ("GoPresetButton" + std::to_string(i++)).c_str(), b);
   }
-  for (size_t i = 0; button::Button * b : this->set_preset_buttons_) {
-    LOG_BUTTON("  ", ("SetPresetButton" + std::to_string(++i)).c_str(), b);
+  for (size_t i = 1; button::Button * b : this->set_preset_buttons_) {
+    LOG_BUTTON("  ", ("SetPresetButton" + std::to_string(i++)).c_str(), b);
   }
-  // LOG_BUTTON("  ", "GoPreset1Button", this->go_preset_1_button_);
-  // LOG_BUTTON("  ", "GoPreset2Button", this->go_preset_2_button_);
-  // LOG_BUTTON("  ", "GoPreset3Button", this->go_preset_3_button_);
-  // LOG_BUTTON("  ", "GoPreset4Button", this->go_preset_4_button_);
-  // LOG_BUTTON("  ", "SetPreset1Button", this->set_preset_1_button_);
-  // LOG_BUTTON("  ", "SetPreset2Button", this->set_preset_2_button_);
-  // LOG_BUTTON("  ", "SetPreset3Button", this->set_preset_3_button_);
-  // LOG_BUTTON("  ", "SetPreset4Button", this->set_preset_4_button_);
-
   LOG_BUTTON("  ", "SetMaxHeightButton", this->set_max_height_button_);
   LOG_BUTTON("  ", "SetMinHeightButton", this->set_min_height_button_);
   LOG_BUTTON("  ", "ClearMaxHeightButton", this->clear_max_height_button_);
@@ -83,7 +74,8 @@ void FullyJarvisFComponent::setup() {
 void FullyJarvisFComponent::reset_all_sensors_() {
 // resets all the settings to a valid initial state
 
-// TODO: some of these sensors could be nullptr (don't exactly know why)
+// TODO: some of these sensors could be nullptr (if they're not defined/specified in the esphome yaml - as most of them
+// are optional)
 //       we should consider checking this, before we actually call the publish_state fn
 #ifdef USE_BINARY_SENSOR
   this->initialized_binary_sensor_->publish_state(false);
@@ -204,7 +196,7 @@ void FullyJarvisFComponent::loop() {
   }
 
   if (isValid) {
-    ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr(), incomingMsg.getType());
+    ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
     ESP_LOGV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
     this->handle_incoming_data_(incomingMsg);
   }
@@ -322,7 +314,7 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
 }
 
 void FullyJarvisFComponent::send_command_(const FullyJarvisFMessage &msg, uint8_t reps = 1) {
-  ESP_LOGI(TAG, "Sending COMMAND: %s (%02x)", msg.getTypeStr(), msg.getType());
+  ESP_LOGI(TAG, "Sending COMMAND: %s (%02x)", msg.getTypeStr().c_str(), msg.getType());
   ESP_LOGV(TAG, "Sending COMMAND %s", msg.toString().c_str());
 
   // if (msg == nullptr) {
