@@ -197,13 +197,13 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 #define LOG_TEXT_SENSOR_VAL(obj) \
   if ((obj) != nullptr) { \
     ESP_LOGV(TAG, "%s text_sensor has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
-             (obj)->get_raw_state()); \
+             (obj)->get_raw_state().c_str()); \
   }
 
 #define LOG_SELECT_VAL(obj) \
   if ((obj) != nullptr) { \
     ESP_LOGV(TAG, "%s select has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
-             (obj)->state); \
+             (obj)->state.c_str()); \
   }
 
 #define LOG_NUMBER_VAL(obj) \
