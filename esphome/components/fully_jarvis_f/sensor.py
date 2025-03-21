@@ -26,79 +26,62 @@ CONF_USER_LIMIT_MAX_HEIGHT = "user_limit_max_height"
 CONF_SYS_LIMIT_MIN_HEIGHT = "sys_limit_min_height"
 CONF_SYS_LIMIT_MAX_HEIGHT = "sys_limit_max_height"
 
-
-def validate_preset_height_dependency(config):
-    if (
-        "preset_1_height" in config
-        or "preset_2_height" in config
-        or "preset_3_height" in config
-        or "preset_4_height" in config
-    ) and "sys_limit_min_height" not in config:
-        raise cv.Invalid(
-            "sys_limit_min_height must be defined when preset_x_height is configured"
-        )
-    return config
-
-
-CONFIG_SCHEMA = cv.All(
-    cv.Schema(
-        {
-            cv.GenerateID(CONF_FULLY_JARVIS_F_ID): cv.use_id(FullyJarvisFComponent),
-            cv.Optional(CONF_PRESET_1_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                accuracy_decimals=0,
-                icon=ICON_COUNTER,
-            ),
-            cv.Optional(CONF_PRESET_2_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                accuracy_decimals=0,
-                icon=ICON_COUNTER,
-            ),
-            cv.Optional(CONF_PRESET_3_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                accuracy_decimals=0,
-                icon=ICON_COUNTER,
-            ),
-            cv.Optional(CONF_PRESET_4_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                accuracy_decimals=0,
-                icon=ICON_COUNTER,
-            ),
-            cv.Optional(CONF_USER_LIMIT_MIN_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                accuracy_decimals=0,
-                icon=ICON_ACCOUNT,
-            ),
-            cv.Optional(CONF_USER_LIMIT_MAX_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                accuracy_decimals=0,
-                icon=ICON_ACCOUNT,
-            ),
-            cv.Optional(CONF_SYS_LIMIT_MIN_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                accuracy_decimals=0,
-                icon=ICON_MEMORY,
-            ),
-            cv.Optional(CONF_SYS_LIMIT_MAX_HEIGHT): sensor.sensor_schema(
-                device_class=DEVICE_CLASS_DISTANCE,
-                unit_of_measurement=UNIT_MILLIMETER,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                accuracy_decimals=0,
-                icon=ICON_MEMORY,
-            ),
-        }
-    ),
-    validate_preset_height_dependency,
+CONFIG_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(CONF_FULLY_JARVIS_F_ID): cv.use_id(FullyJarvisFComponent),
+        cv.Optional(CONF_PRESET_1_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            accuracy_decimals=0,
+            icon=ICON_COUNTER,
+        ),
+        cv.Optional(CONF_PRESET_2_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            accuracy_decimals=0,
+            icon=ICON_COUNTER,
+        ),
+        cv.Optional(CONF_PRESET_3_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            accuracy_decimals=0,
+            icon=ICON_COUNTER,
+        ),
+        cv.Optional(CONF_PRESET_4_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            accuracy_decimals=0,
+            icon=ICON_COUNTER,
+        ),
+        cv.Optional(CONF_USER_LIMIT_MIN_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            accuracy_decimals=0,
+            icon=ICON_ACCOUNT,
+        ),
+        cv.Optional(CONF_USER_LIMIT_MAX_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            accuracy_decimals=0,
+            icon=ICON_ACCOUNT,
+        ),
+        cv.Optional(CONF_SYS_LIMIT_MIN_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            accuracy_decimals=0,
+            icon=ICON_MEMORY,
+        ),
+        cv.Optional(CONF_SYS_LIMIT_MAX_HEIGHT): sensor.sensor_schema(
+            device_class=DEVICE_CLASS_DISTANCE,
+            unit_of_measurement=UNIT_MILLIMETER,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            accuracy_decimals=0,
+            icon=ICON_MEMORY,
+        ),
+    }
 )
 
 

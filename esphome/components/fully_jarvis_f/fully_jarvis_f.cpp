@@ -232,8 +232,10 @@ void FullyJarvisFComponent::ensure_settings_initialized_() {
       this->mark_failed();
     } else {
       if (this->init_state_machine_state_ == InitStateMachineState::Start) {
+        // TODO: this works, but really on the 4th try, it really needs a full state machine here..
         // dirty hack (I'm lazy, don't judge me)
         // let's try and give it one more chance to give us the damn height info
+
         this->get_settings_();
         this->set_timeout("ensure_settings_initialized_", 3800, [this]() { this->ensure_settings_initialized_(); });
         this->init_state_machine_state_ = InitStateMachineState::Height;
