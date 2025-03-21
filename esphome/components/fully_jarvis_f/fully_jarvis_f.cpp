@@ -97,8 +97,7 @@ void FullyJarvisFComponent::reset_all_sensors_() {
 #ifdef USE_TEXT_SENSOR
   this->user_limit_set_text_sensor_->publish_state(
       USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_UNKNOWN));
-  // TODO: define values for this text sensor
-  this->status_text_sensor_->publish_state("unknown");
+  this->status_text_sensor_->publish_state(STATUS_INT_TO_ENUM.at(StatusStructure::STATUS_SETUP));
 #endif
 #ifdef USE_SELECT
   this->units_select_->publish_state(UNITS_INT_TO_ENUM.at(UnitsStructure::UNITS_UNKNOWN));
@@ -135,18 +134,30 @@ bool FullyJarvisFComponent::is_initialized_() {
                                            !std::isnan(this->preset_2_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->preset_3_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->preset_4_height_sensor_->get_raw_state()) &&
-                                           !std::isnan(this->user_limit_min_height_sensor_->get_raw_state()) &&
-                                           !std::isnan(this->user_limit_max_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->sys_limit_min_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->sys_limit_max_height_sensor_->get_raw_state());
-  if (!sensors_initialization_successful)
+
+  bool user_limit_sensors_initialization_successful = false;
+
+  if (this->user_limit_set_text_sensor_->get_raw_state() ==
+      USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_MIN))
+    user_limit_sensors_initialization_successful = !std::isnan(this->user_limit_min_height_sensor_->get_raw_state());
+  else if (this->user_limit_set_text_sensor_->get_raw_state() ==
+           USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_MAX))
+    user_limit_sensors_initialization_successful = !std::isnan(this->user_limit_max_height_sensor_->get_raw_state());
+  else if ((this->user_limit_set_text_sensor_->get_raw_state() ==
+            USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_BOTH)))
+    user_limit_sensors_initialization_successful = !std::isnan(this->user_limit_min_height_sensor_->get_raw_state()) &&
+                                                   !std::isnan(this->user_limit_max_height_sensor_->get_raw_state());
+
+  if (!sensors_initialization_successful || !user_limit_sensors_initialization_successful)
     return false;
 #endif
 #ifdef USE_TEXT_SENSOR
   bool text_sensors_initialization_successful =
       this->user_limit_set_text_sensor_->get_raw_state() !=
           USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_UNKNOWN) &&
-      this->status_text_sensor_->get_raw_state() != "unknown";
+      this->status_text_sensor_->get_raw_state() != STATUS_INT_TO_ENUM.at(StatusStructure::STATUS_UNKNOWN);
   if (!text_sensors_initialization_successful)
     return false;
 #endif
@@ -233,19 +244,6 @@ void FullyJarvisFComponent::loop() {
       incomingMsg = FullyJarvisFMessage();
     }
   }
-
-  // FullyJarvisFMessage incomingMsg;
-  // bool isValid = false;
-  // while (available() > 0 && !isValid) {
-  //   int r = read();
-  //   isValid = incomingMsg.parseAndLoadMessage(r);
-  // }
-
-  // if (isValid) {
-  //   ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
-  //   ESP_LOGVV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
-  //   this->handle_incoming_data_(incomingMsg);
-  // }
 }
 
 void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg) {

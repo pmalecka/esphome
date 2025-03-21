@@ -90,6 +90,51 @@ static const std::map<uint8_t, std::string> USER_LIMIT_SET_INT_TO_ENUM{{USER_LIM
                                                                        {USER_LIMIT_SET_MIN, "min"},
                                                                        {USER_LIMIT_SET_BOTH, "both"},
                                                                        {USER_LIMIT_SET_UNKNOWN, "unknown"}};
+// setup, initialized, going_up, going_down, at_preset_1,
+// at_preset_2, at_preset_3, at_preset_4, at_user_min, at_user_max, at_sys_min, at_sys_max
+enum StatusStructure : uint8_t {
+  STATUS_SETUP,
+  STATUS_INITIALIZED,
+  STATUS_GOING_UP,
+  STATUS_GOING_DOWN,
+  STATUS_AT_PRESET_1,
+  STATUS_AT_PRESET_2,
+  STATUS_AT_PRESET_3,
+  STATUS_AT_PRESET_4,
+  STATUS_AT_USER_MIN,
+  STATUS_AT_USER_MAX,
+  STATUS_AT_SYS_MIN,
+  STATUS_AT_SYS_MAX,
+  STATUS_UNKNOWN = 0xFF
+};
+
+static const std::map<std::string, uint8_t> STATUS_ENUM_TO_INT{{"setup", STATUS_SETUP},
+                                                               {"initialized", STATUS_INITIALIZED},
+                                                               {"going_up", STATUS_GOING_UP},
+                                                               {"going_down", STATUS_GOING_DOWN},
+                                                               {"at_preset_1", STATUS_AT_PRESET_1},
+                                                               {"at_preset_2", STATUS_AT_PRESET_2},
+                                                               {"at_preset_3", STATUS_AT_PRESET_3},
+                                                               {"at_preset_4", STATUS_AT_PRESET_4},
+                                                               {"at_user_min", STATUS_AT_USER_MIN},
+                                                               {"at_user_max", STATUS_AT_USER_MAX},
+                                                               {"at_sys_min", STATUS_AT_SYS_MIN},
+                                                               {"at_sys_max", STATUS_AT_SYS_MAX},
+                                                               {"unknown", STATUS_UNKNOWN}};
+
+static const std::map<uint8_t, std::string> STATUS_INT_TO_ENUM{{STATUS_SETUP, "setup"},
+                                                               {STATUS_INITIALIZED, "initialized"},
+                                                               {STATUS_GOING_UP, "going_up"},
+                                                               {STATUS_GOING_DOWN, "going_down"},
+                                                               {STATUS_AT_PRESET_1, "at_preset_1"},
+                                                               {STATUS_AT_PRESET_2, "at_preset_2"},
+                                                               {STATUS_AT_PRESET_3, "at_preset_3"},
+                                                               {STATUS_AT_PRESET_4, "at_preset_4"},
+                                                               {STATUS_AT_USER_MIN, "at_user_min"},
+                                                               {STATUS_AT_USER_MAX, "at_user_max"},
+                                                               {STATUS_AT_SYS_MIN, "at_sys_min"},
+                                                               {STATUS_AT_SYS_MAX, "at_sys_max"},
+                                                               {STATUS_UNKNOWN, "unknown"}};
 
 class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 #ifdef USE_SENSOR
@@ -107,9 +152,7 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 #endif
 #ifdef USE_TEXT_SENSOR
   SUB_TEXT_SENSOR(user_limit_set)
-  SUB_TEXT_SENSOR(
-      status)  // TODO: following values should be possible: setup, initialized, going_up, going_down, at_preset_1,
-               // at_preset_2, at_preset_3, at_preset_4, at_user_min, at_user_max, at_sys_min, at_sys_max
+  SUB_TEXT_SENSOR(status)
 #endif
 #ifdef USE_SELECT
   SUB_SELECT(units)
@@ -118,14 +161,6 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   SUB_SELECT(sensitivity)
 #endif
 #ifdef USE_BUTTON
-  // SUB_BUTTON(go_preset_1)
-  // SUB_BUTTON(go_preset_2)
-  // SUB_BUTTON(go_preset_3)
-  // SUB_BUTTON(go_preset_4)
-  // SUB_BUTTON(set_preset_1)
-  // SUB_BUTTON(set_preset_2)
-  // SUB_BUTTON(set_preset_3)
-  // SUB_BUTTON(set_preset_4)
   SUB_BUTTON(set_max_height)
   SUB_BUTTON(set_min_height)
   SUB_BUTTON(clear_max_height)
