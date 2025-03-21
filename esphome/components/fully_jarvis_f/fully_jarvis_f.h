@@ -208,7 +208,7 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 
 #define LOG_NUMBER_VAL(obj) \
   if ((obj) != nullptr) { \
-    ESP_LOGV(TAG, "%s number has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
+    ESP_LOGV(TAG, "%s number has state: %d, value: '%.2f'", (obj)->get_name().c_str(), (obj)->has_state(), \
              (obj)->state); \
   }
 
