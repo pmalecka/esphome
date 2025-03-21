@@ -216,18 +216,36 @@ void FullyJarvisFComponent::ensure_settings_initialized_() {
 }
 
 void FullyJarvisFComponent::loop() {
+  // Create a message accumulator on the stack.
   FullyJarvisFMessage incomingMsg;
-  bool isValid = false;
-  while (available() > 0 && !isValid) {
-    int r = read();
-    isValid = incomingMsg.parseAndLoadMessage(r);
+
+  // Continue reading while bytes are available.
+  while (available() > 0) {
+    int r = read();  // Read one byte.
+    if (incomingMsg.parseAndLoadMessage(r)) {
+      // A complete message has been constructed.
+      ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
+      ESP_LOGVV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
+      this->handle_incoming_data_(incomingMsg);
+      // Reinitialize the accumulator by assigning a new, clean instance.
+      // Since incomingMsg is a stack object and assignment will call the
+      // destructor on the old contents (if needed) and then copy, no memory is leaked.
+      incomingMsg = FullyJarvisFMessage();
+    }
   }
 
-  if (isValid) {
-    ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
-    ESP_LOGVV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
-    this->handle_incoming_data_(incomingMsg);
-  }
+  // FullyJarvisFMessage incomingMsg;
+  // bool isValid = false;
+  // while (available() > 0 && !isValid) {
+  //   int r = read();
+  //   isValid = incomingMsg.parseAndLoadMessage(r);
+  // }
+
+  // if (isValid) {
+  //   ESP_LOGI(TAG, "Incoming COMMAND: %s (%02x)", incomingMsg.getTypeStr().c_str(), incomingMsg.getType());
+  //   ESP_LOGVV(TAG, "Incoming COMMAND %s", incomingMsg.toString().c_str());
+  //   this->handle_incoming_data_(incomingMsg);
+  // }
 }
 
 void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg) {
