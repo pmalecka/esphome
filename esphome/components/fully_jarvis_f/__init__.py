@@ -33,9 +33,22 @@ def final_validate(config):
         or "preset_3_height" in config
         or "preset_4_height" in config
     ):
-        if "units_select" not in config.get("select", {}):
+        errors = []
+
+        # Check sensor dependency in current config
+        if "sys_limit_min_height" not in config:
+            errors.append("sys_limit_min_height sensor")
+
+        # Check select component from other files
+        has_units_select = any(
+            s.get("id") == "units_select" for s in config.get("select", [])
+        )
+        if not has_units_select:
+            errors.append("units_select component")
+
+        if errors:
             raise cv.Invalid(
-                "units_select must be defined when preset_x_height is configured"
+                f"Required when using preset_x_height: {', '.join(errors)}"
             )
     return config
 
