@@ -24,19 +24,41 @@ CONFIG_SCHEMA = cv.All(
     .extend(cv.COMPONENT_SCHEMA)
 )
 
+CONF_PRESET_1_HEIGHT = "preset_1_height"
+CONF_SYS_LIMIT_MIN_HEIGHT = "sys_limit_min_height"
+CONF_UNITS_SELECT_ID = "units_select"
+
 
 # This validation runs after all components are loaded
 def final_validate(config):
-    # Validate sensor dependencies
-    if "preset_1_height" in config:
-        if "sys_limit_min_height" not in config:
-            raise cv.Invalid(
-                "sys_limit_min_height is required when preset_x_height is defined."
+    # Check all sensor configurations
+    jarvis_sensors = [
+        s for s in config.get("sensor", []) if s.get("platform") == "fully_jarvis_f"
+    ]
+
+    for sensor_conf in jarvis_sensors:
+        if CONF_PRESET_1_HEIGHT in sensor_conf:
+            # 1. Validate sys_limit_min_height in the same sensor block
+            if CONF_SYS_LIMIT_MIN_HEIGHT not in sensor_conf:
+                raise cv.Invalid(
+                    f"'{CONF_SYS_LIMIT_MIN_HEIGHT}' is required when using '{CONF_PRESET_1_HEIGHT}'",
+                    [sensor_conf],
+                )
+
+            # 2. Validate units_select in select components
+            units_select_found = any(
+                sel.get("id") == CONF_UNITS_SELECT_ID
+                for sel in config.get("select", [])
+                if sel.get("platform") == "fully_jarvis_f"
+                and "unit_of_measurement" in sel
             )
 
-    # Validate select dependencies
-    if "units_select" not in config.get("select", {}):
-        raise cv.Invalid("units_select is required when preset_x_height is defined.")
+            if not units_select_found:
+                raise cv.Invalid(
+                    f"Select component with id '{CONF_UNITS_SELECT_ID}' is required "
+                    f"when using '{CONF_PRESET_1_HEIGHT}'",
+                    [sensor_conf],
+                )
 
     return config
 
