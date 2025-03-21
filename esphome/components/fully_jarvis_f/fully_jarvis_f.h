@@ -218,6 +218,8 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
 
   uint16_t last_reported_height_;
   uint8_t fail_counter_ = 0;
+  enum class InitStateMachineState { Start, Height, End };
+  InitStateMachineState init_state_machine_state_;
 #ifdef USE_BUTTON
   std::vector<button::Button *> go_preset_buttons_ = std::vector<button::Button *>(4);
   std::vector<button::Button *> set_preset_buttons_ = std::vector<button::Button *>(4);

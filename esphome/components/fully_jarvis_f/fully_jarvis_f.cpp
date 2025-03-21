@@ -75,6 +75,8 @@ void FullyJarvisFComponent::setup() {
 void FullyJarvisFComponent::reset_all_sensors_() {
   // resets all the settings to a valid initial state
 
+  this->init_state_machine_state_ = InitStateMachineState::Start;
+
 #ifdef USE_BINARY_SENSOR
   if (this->initialized_binary_sensor_ != nullptr)
     this->initialized_binary_sensor_->publish_state(false);
@@ -135,7 +137,6 @@ void FullyJarvisFComponent::read_all_info() {
   this->get_basic_settings_();  // gets units, kill_mode, touch_mode, sensitivity
   this->get_settings_();        // gets height, preset_1_height, preset_2_height, preset_3_height, preset4_height
   this->get_user_limits_();     // gets user_limit_set, user_limit_min, user_limit_max (if set)
-  this->get_settings_();        // call it again
 
   // set a timeout for getting all these settings ~ we had 630 ms in our old code, let's round up to 800ms
   this->set_timeout("ensure_settings_initialized_", 8800, [this]() { this->ensure_settings_initialized_(); });
@@ -230,6 +231,14 @@ void FullyJarvisFComponent::ensure_settings_initialized_() {
       ESP_LOGV(TAG, "Initalization failed, attempt #%d. Marking as failed.", this->fail_counter_);
       this->mark_failed();
     } else {
+      if (this->init_state_machine_state_ == InitStateMachineState::Start) {
+        // dirty hack (I'm lazy, don't judge me)
+        // let's try and give it one more chance to give us the damn height info
+        this->get_settings_();
+        this->set_timeout("ensure_settings_initialized_", 800, [this]() { this->ensure_settings_initialized_(); });
+        this->init_state_machine_state_ = InitStateMachineState::Height;
+      }
+
       // try to connect again..
       ESP_LOGV(TAG, "Initalization failed, attempt #%d. Retrying..", this->fail_counter_);
       this->read_all_info();

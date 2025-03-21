@@ -47,14 +47,6 @@ def validate_preset_dependencies(config):
     return config
 
 
-def validate_preset_height_dependency(config):
-    if "preset_1_height" in config and "sys_limit_min_height" not in config:
-        raise cv.Invalid(
-            "sys_limit_min_height must be defined when preset_1_height is configured"
-        )
-    return config
-
-
 CONFIG_SCHEMA = cv.All(
     cv.Schema(
         {
@@ -113,7 +105,7 @@ CONFIG_SCHEMA = cv.All(
             ),
         }
     ),
-    validate_preset_height_dependency,
+    validate_preset_dependencies,
 )
 
 
