@@ -199,6 +199,8 @@ void FullyJarvisFComponent::log_initialization_state_() {
 void FullyJarvisFComponent::ensure_settings_initialized_() {
   // validate if all settings have been fetched and set correctly
 
+  this->log_initialization_state_();
+
   if (!this->is_initialized_()) {
     if (++this->fail_counter_ > 10) {
       ESP_LOGV(TAG, "Initalization failed, attempt #%d. Marking as failed.", this->fail_counter_);
@@ -208,9 +210,9 @@ void FullyJarvisFComponent::ensure_settings_initialized_() {
       ESP_LOGV(TAG, "Initalization failed, attempt #%d. Retrying..", this->fail_counter_);
       this->read_all_info();
     }
+  } else {
+    ESP_LOGV(TAG, "Successfully initialized.");
   }
-
-  ESP_LOGV(TAG, "Successfully initialized.");
 }
 
 void FullyJarvisFComponent::loop() {
