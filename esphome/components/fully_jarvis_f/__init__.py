@@ -28,20 +28,18 @@ CONFIG_SCHEMA = cv.All(
 # This validation runs after all components are loaded
 def final_validate(config):
     # Check if any sensor has preset_1_height ID
-    has_preset = any(s.get("id") == "preset_1_height" for s in config.get("sensor", []))
+    has_preset = any(s.get("id") == "preset_1_sensor" for s in config.get("sensor", []))
 
     if has_preset:
         errors = []
 
         # Check for sys_limit_min_height sensor
-        if not any(
-            s.get("id") == "sys_limit_min_height" for s in config.get("sensor", [])
-        ):
-            errors.append("sys_limit_min_height sensor")
+        if not any(s.get("id") == "sys_limit_min" for s in config.get("sensor", [])):
+            errors.append("sys_limit_min sensor")
 
         # Check for units_select in select components
         if not any(s.get("id") == "units_select" for s in config.get("select", [])):
-            errors.append("units_select component")
+            errors.append("units_select select")
 
         if errors:
             raise cv.Invalid(
