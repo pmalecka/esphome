@@ -176,6 +176,7 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   void reset_all_sensors_();
   void ensure_settings_initialized_();
   bool is_initialized_();
+  void log_initialization_state_();
 
   float preset_val_to_height_(uint16_t raw);
 
@@ -186,6 +187,30 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   std::vector<button::Button *> set_preset_buttons_ = std::vector<button::Button *>(4);
 #endif
 };
+
+#define LOG_SENSOR_VAL(obj) \
+  if ((obj) != nullptr) { \
+    ESP_LOGV(TAG, "%s sensor has state: %d, value: '%.2f'", (obj)->get_name().c_str(), (obj)->has_state(), \
+             (obj)->get_raw_state()); \
+  }
+
+#define LOG_TEXT_SENSOR_VAL(obj) \
+  if ((obj) != nullptr) { \
+    ESP_LOGV(TAG, "%s text_sensor has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
+             (obj)->get_raw_state()); \
+  }
+
+#define LOG_SELECT_VAL(obj) \
+  if ((obj) != nullptr) { \
+    ESP_LOGV(TAG, "%s select has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
+             (obj)->state); \
+  }
+
+#define LOG_NUMBER_VAL(obj) \
+  if ((obj) != nullptr) { \
+    ESP_LOGV(TAG, "%s number has state: %d, value: '%s'", (obj)->get_name().c_str(), (obj)->has_state(), \
+             (obj)->state); \
+  }
 
 }  // namespace fully_jarvis_f
 }  // namespace esphome

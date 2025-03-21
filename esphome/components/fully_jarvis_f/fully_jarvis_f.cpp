@@ -170,6 +170,32 @@ bool FullyJarvisFComponent::is_initialized_() {
   return true;
 }
 
+void FullyJarvisFComponent::log_initialization_state_() {
+#ifdef USE_SENSOR
+  LOG_SENSOR_VAL(this->preset_1_height_sensor_);
+  LOG_SENSOR_VAL(this->preset_2_height_sensor_);
+  LOG_SENSOR_VAL(this->preset_3_height_sensor_);
+  LOG_SENSOR_VAL(this->preset_4_height_sensor_);
+  LOG_SENSOR_VAL(this->user_limit_min_height_sensor_);
+  LOG_SENSOR_VAL(this->user_limit_max_height_sensor_);
+  LOG_SENSOR_VAL(this->sys_limit_min_height_sensor_);
+  LOG_SENSOR_VAL(this->sys_limit_max_height_sensor_);
+#endif
+#ifdef USE_TEXT_SENSOR
+  LOG_TEXT_SENSOR_VAL(this->user_limit_set_text_sensor_);
+  LOG_TEXT_SENSOR_VAL(this->status_text_sensor_);
+#endif
+#ifdef USE_SELECT
+  LOG_SELECT_VAL(this->units_select_);
+  LOG_SELECT_VAL(this->touch_mode_select_);
+  LOG_SELECT_VAL(this->kill_mode_select_);
+  LOG_SELECT_VAL(this->sensitivity_select_);
+#endif
+#ifdef USE_NUMBER
+  LOG_NUMBER_VAL(this->height_number_);
+#endif
+}
+
 void FullyJarvisFComponent::ensure_settings_initialized_() {
   // validate if all settings have been fetched and set correctly
 
