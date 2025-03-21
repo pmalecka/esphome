@@ -24,25 +24,19 @@ CONFIG_SCHEMA = cv.All(
     .extend(cv.COMPONENT_SCHEMA)
 )
 
-CONF_PRESET_1_HEIGHT = "preset_1_height"
-CONF_SYS_LIMIT_MIN_HEIGHT = "sys_limit_min_height"
-CONF_UNIT_OF_MEASUREMENT = "unit_of_measurement"
-
 
 # This validation runs after all components are loaded
 def final_validate(config):
     # Validate sensor dependencies
-    if CONF_PRESET_1_HEIGHT in config:
-        if CONF_SYS_LIMIT_MIN_HEIGHT not in config:
+    if "preset_1_height" in config:
+        if "sys_limit_min_height" not in config:
             raise cv.Invalid(
-                f"{CONF_SYS_LIMIT_MIN_HEIGHT} is required when {CONF_PRESET_1_HEIGHT} is defined."
+                "sys_limit_min_height is required when preset_x_height is defined."
             )
 
     # Validate select dependencies
-    if CONF_UNIT_OF_MEASUREMENT not in config.get("select", {}):
-        raise cv.Invalid(
-            f"{CONF_UNIT_OF_MEASUREMENT} is required when {CONF_PRESET_1_HEIGHT} is defined."
-        )
+    if "units_select" not in config.get("select", {}):
+        raise cv.Invalid("units_select is required when preset_x_height is defined.")
 
     return config
 
