@@ -25,13 +25,31 @@ CONFIG_SCHEMA = cv.All(
 )
 
 
-FINAL_VALIDATE_SCHEMA = uart.final_validate_device_schema(
-    "fully_jarvis_f",
-    baud_rate=9600,
-    require_tx=True,
-    require_rx=True,
-    parity="NONE",
-    stop_bits=1,
+# This validation runs after all components are loaded
+def final_validate(config):
+    if (
+        "preset_1_height" in config
+        or "preset_2_height" in config
+        or "preset_3_height" in config
+        or "preset_4_height" in config
+    ):
+        if "units_select" not in config.get("select", {}):
+            raise cv.Invalid(
+                "units_select must be defined when preset_x_height is configured"
+            )
+    return config
+
+
+FINAL_VALIDATE_SCHEMA = cv.All(
+    uart.final_validate_device_schema(
+        "fully_jarvis_f",
+        baud_rate=9600,
+        require_tx=True,
+        require_rx=True,
+        parity="NONE",
+        stop_bits=1,
+    ),
+    final_validate,
 )
 
 

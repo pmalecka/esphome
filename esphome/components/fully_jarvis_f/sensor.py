@@ -27,23 +27,16 @@ CONF_SYS_LIMIT_MIN_HEIGHT = "sys_limit_min_height"
 CONF_SYS_LIMIT_MAX_HEIGHT = "sys_limit_max_height"
 
 
-def validate_preset_dependencies(config):
+def validate_preset_height_dependency(config):
     if (
         "preset_1_height" in config
         or "preset_2_height" in config
         or "preset_3_height" in config
         or "preset_4_height" in config
-    ):
-        missing = []
-        if "sys_limit_min_height" not in config:
-            missing.append("sys_limit_min_height")
-        if not any(s.get("id") == "units_select" for s in config.get("select", [])):
-            missing.append("units_select")
-
-        if missing:
-            raise cv.Invalid(
-                f"Required components when using preset_1_height: {', '.join(missing)}"
-            )
+    ) and "sys_limit_min_height" not in config:
+        raise cv.Invalid(
+            "sys_limit_min_height must be defined when preset_x_height is configured"
+        )
     return config
 
 
@@ -105,7 +98,7 @@ CONFIG_SCHEMA = cv.All(
             ),
         }
     ),
-    validate_preset_dependencies,
+    validate_preset_height_dependency,
 )
 
 
