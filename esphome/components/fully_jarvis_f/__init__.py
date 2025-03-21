@@ -27,28 +27,32 @@ CONFIG_SCHEMA = cv.All(
 
 # This validation runs after all components are loaded
 def final_validate(config):
-    # Check if any sensor has preset_1_height ID
-    has_preset = any(s.get("id") == "preset_1_sensor" for s in config.get("sensor", []))
+    # Check sensor platform configurations
+    jarvis_sensors = config.get("fully_jarvis_f.sensor", [])
+
+    has_preset = any(s.get("id") == "preset_1_sensor" for s in jarvis_sensors)
 
     if has_preset:
         errors = []
 
-        # Check for sys_limit_min_height sensor
-        if not any(s.get("id") == "sys_limit_min" for s in config.get("sensor", [])):
-            errors.append("sys_limit_min sensor")
+        # Check for sys_limit_min sensor in the same platform
+        if not any(s.get("id") == "sys_limit_min" for s in jarvis_sensors):
+            errors.append("sys_limit_min sensor in fully_jarvis_f sensor platform")
 
-        # Check for units_select in select components
-        if not any(s.get("id") == "units_select" for s in config.get("select", [])):
-            errors.append("units_select select")
+        # Check for units_select in select platform
+        jarvis_selects = config.get("fully_jarvis_f.select", [])
+        if not any(s.get("id") == "units_select" for s in jarvis_selects):
+            errors.append("units_select in fully_jarvis_f select platform")
 
         if errors:
             raise cv.Invalid(
-                f"Required when using preset_x_height: {', '.join(errors)}"
+                f"Missing required components when using preset_x_height: {', '.join(errors)}"
             )
     return config
 
 
 FINAL_VALIDATE_SCHEMA = cv.All(
+    CONFIG_SCHEMA,
     uart.final_validate_device_schema(
         "fully_jarvis_f",
         baud_rate=9600,
