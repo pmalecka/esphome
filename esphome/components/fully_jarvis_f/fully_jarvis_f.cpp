@@ -31,6 +31,7 @@ void FullyJarvisFComponent::dump_config() {
   LOG_BUTTON("  ", "SetMinHeightButton", this->set_min_height_button_);
   LOG_BUTTON("  ", "ClearMaxHeightButton", this->clear_max_height_button_);
   LOG_BUTTON("  ", "ClearMinHeightButton", this->clear_min_height_button_);
+  LOG_BUTTON("  ", "RestartButton", this->restart_button_);
 #endif
 #ifdef USE_SENSOR
   LOG_SENSOR("  ", "Preset1HeightSensor", this->preset_1_height_sensor_);
@@ -72,42 +73,55 @@ void FullyJarvisFComponent::setup() {
 }
 
 void FullyJarvisFComponent::reset_all_sensors_() {
-// resets all the settings to a valid initial state
+  // resets all the settings to a valid initial state
 
-// TODO: some of these sensors could be nullptr (if they're not defined/specified in the esphome yaml - as most of them
-// are optional)
-//       we should consider checking this, before we actually call the publish_state fn
 #ifdef USE_BINARY_SENSOR
-  this->initialized_binary_sensor_->publish_state(false);
+  if (this->initialized_binary_sensor_ != nullptr)
+    this->initialized_binary_sensor_->publish_state(false);
 #endif
 
 #ifdef USE_SENSOR
-  // TODO: all of these preset_x_height sensors depend on sys_limit_min and units
-  //       if those are not defined, then these sensors will just report NAN always
-  this->preset_1_height_sensor_->publish_state(NAN);
-  this->preset_2_height_sensor_->publish_state(NAN);
-  this->preset_3_height_sensor_->publish_state(NAN);
-  this->preset_4_height_sensor_->publish_state(NAN);
+  if (this->preset_1_height_sensor_ != nullptr)
+    this->preset_1_height_sensor_->publish_state(NAN);
+  if (this->preset_2_height_sensor_ != nullptr)
+    this->preset_2_height_sensor_->publish_state(NAN);
+  if (this->preset_3_height_sensor_ != nullptr)
+    this->preset_3_height_sensor_->publish_state(NAN);
+  if (this->preset_4_height_sensor_ != nullptr)
+    this->preset_4_height_sensor_->publish_state(NAN);
 
-  this->user_limit_min_height_sensor_->publish_state(NAN);
-  this->user_limit_max_height_sensor_->publish_state(NAN);
-  this->sys_limit_min_height_sensor_->publish_state(NAN);
-  this->sys_limit_max_height_sensor_->publish_state(NAN);
+  if (this->user_limit_min_height_sensor_ != nullptr)
+    this->user_limit_min_height_sensor_->publish_state(NAN);
+  if (this->user_limit_max_height_sensor_ != nullptr)
+    this->user_limit_max_height_sensor_->publish_state(NAN);
+  if (this->sys_limit_min_height_sensor_ != nullptr)
+    this->sys_limit_min_height_sensor_->publish_state(NAN);
+  if (this->sys_limit_max_height_sensor_ != nullptr)
+    this->sys_limit_max_height_sensor_->publish_state(NAN);
 #endif
 #ifdef USE_TEXT_SENSOR
-  this->user_limit_set_text_sensor_->publish_state(
-      USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_UNKNOWN));
-  this->status_text_sensor_->publish_state(STATUS_INT_TO_ENUM.at(StatusStructure::STATUS_SETUP));
+
+  if (this->sys_limit_max_height_sensor_ != nullptr)
+    this->user_limit_set_text_sensor_->publish_state(
+        USER_LIMIT_SET_INT_TO_ENUM.at(UserLimitSetStructure::USER_LIMIT_SET_UNKNOWN));
+  if (this->status_text_sensor_ != nullptr)
+    this->status_text_sensor_->publish_state(STATUS_INT_TO_ENUM.at(StatusStructure::STATUS_SETUP));
 #endif
 #ifdef USE_SELECT
-  this->units_select_->publish_state(UNITS_INT_TO_ENUM.at(UnitsStructure::UNITS_UNKNOWN));
-  this->touch_mode_select_->publish_state(TOUCH_MODE_INT_TO_ENUM.at(TouchModeStructure::TOUCH_MODE_UNKNOWN));
-  this->kill_mode_select_->publish_state(KILL_MODE_INT_TO_ENUM.at(KillModeStructure::KILL_MODE_UNKNOWN));
-  this->sensitivity_select_->publish_state(SENSITIVITY_INT_TO_ENUM.at(SensitivityStructure::SENSITIVITY_UNKNOWN));
+  if (this->units_select_ != nullptr)
+    this->units_select_->publish_state(UNITS_INT_TO_ENUM.at(UnitsStructure::UNITS_UNKNOWN));
+  if (this->touch_mode_select_ != nullptr)
+    this->touch_mode_select_->publish_state(TOUCH_MODE_INT_TO_ENUM.at(TouchModeStructure::TOUCH_MODE_UNKNOWN));
+  if (this->kill_mode_select_ != nullptr)
+    this->kill_mode_select_->publish_state(KILL_MODE_INT_TO_ENUM.at(KillModeStructure::KILL_MODE_UNKNOWN));
+  if (this->sensitivity_select_ != nullptr)
+    this->sensitivity_select_->publish_state(SENSITIVITY_INT_TO_ENUM.at(SensitivityStructure::SENSITIVITY_UNKNOWN));
 #endif
 #ifdef USE_NUMBER
-  this->height_number_->publish_state(NAN);
-  this->offset_number_->publish_state(NAN);
+  if (this->height_number_ != nullptr)
+    this->height_number_->publish_state(NAN);
+  if (this->offset_number_ != nullptr)
+    this->offset_number_->publish_state(NAN);
 #endif
 }
 
@@ -121,6 +135,7 @@ void FullyJarvisFComponent::read_all_info() {
   this->get_basic_settings_();  // gets units, kill_mode, touch_mode, sensitivity
   this->get_settings_();        // gets height, preset_1_height, preset_2_height, preset_3_height, preset4_height
   this->get_user_limits_();     // gets user_limit_set, user_limit_min, user_limit_max (if set)
+  this->get_settings_();        // call it again
 
   // set a timeout for getting all these settings ~ we had 630 ms in our old code, let's round up to 800ms
   this->set_timeout("ensure_settings_initialized_", 8800, [this]() { this->ensure_settings_initialized_(); });
@@ -128,8 +143,6 @@ void FullyJarvisFComponent::read_all_info() {
 
 bool FullyJarvisFComponent::is_initialized_() {
 #ifdef USE_SENSOR
-  // TODO: all of these preset_x_height sensors depend on sys_limit_min and units
-  //       if those are not defined, then these sensors will just report NAN always
   bool sensors_initialization_successful = !std::isnan(this->preset_1_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->preset_2_height_sensor_->get_raw_state()) &&
                                            !std::isnan(this->preset_3_height_sensor_->get_raw_state()) &&
@@ -247,17 +260,16 @@ void FullyJarvisFComponent::loop() {
 }
 
 void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg) {
-  // TODO: add guards that don't change value if they don't need to be changed.. (as with the height below)
-  // add also check if the sensor is even defined (nullptr check) and if the entity type is define (ifdef use_sensor,
-  // etc..)
   switch (msg.getType()) {
     case IncomingCommandType::LocPreset1: {
       uint16_t preset_1_raw = msg.getParam<uint16_t>();
       ESP_LOGD(TAG, "preset_1_raw %u", (unsigned int) preset_1_raw);
       float preset_height = preset_val_to_height_(preset_1_raw);
       if (!std::isnan(preset_height)) {
-        this->preset_1_height_sensor_->publish_state(preset_height);
-        ESP_LOGV(TAG, "Setting Preset_1 to: %f", preset_height);
+        if (this->preset_1_height_sensor_ != nullptr && this->preset_1_height_sensor_->state != preset_height) {
+          this->preset_1_height_sensor_->publish_state(preset_height);
+          ESP_LOGV(TAG, "Setting Preset_1 to: %f", preset_height);
+        }
       } else {
         ESP_LOGV(TAG, "Cannot set preset_1 yet. units: %s, sys_limit_min_height: %f",
                  this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
@@ -269,8 +281,10 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       ESP_LOGD(TAG, "preset_2_raw %u", (unsigned int) preset_2_raw);
       float preset_height = preset_val_to_height_(preset_2_raw);
       if (!std::isnan(preset_height)) {
-        this->preset_2_height_sensor_->publish_state(preset_height);
-        ESP_LOGV(TAG, "Setting Preset_2 to: %f", preset_height);
+        if (this->preset_2_height_sensor_ != nullptr && this->preset_2_height_sensor_->state != preset_height) {
+          this->preset_2_height_sensor_->publish_state(preset_height);
+          ESP_LOGV(TAG, "Setting Preset_2 to: %f", preset_height);
+        }
       } else {
         ESP_LOGV(TAG, "Cannot set preset_2 yet. units: %s, sys_limit_min_height: %f",
                  this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
@@ -282,8 +296,10 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       ESP_LOGD(TAG, "preset_3_raw %u", (unsigned int) preset_3_raw);
       float preset_height = preset_val_to_height_(preset_3_raw);
       if (!std::isnan(preset_height)) {
-        this->preset_3_height_sensor_->publish_state(preset_height);
-        ESP_LOGV(TAG, "Setting Preset_3 to: %f", preset_height);
+        if (this->preset_3_height_sensor_ != nullptr && this->preset_3_height_sensor_->state != preset_height) {
+          this->preset_3_height_sensor_->publish_state(preset_height);
+          ESP_LOGV(TAG, "Setting Preset_3 to: %f", preset_height);
+        }
       } else {
         ESP_LOGV(TAG, "Cannot set preset_3 yet. units: %s, sys_limit_min_height: %f",
                  this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
@@ -295,14 +311,22 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       ESP_LOGD(TAG, "preset_4_raw %u", (unsigned int) preset_4_raw);
       float preset_height = preset_val_to_height_(preset_4_raw);
       if (!std::isnan(preset_height)) {
-        this->preset_4_height_sensor_->publish_state(preset_height);
-        ESP_LOGV(TAG, "Setting Preset_4 to: %f", preset_height);
+        if (this->preset_4_height_sensor_ != nullptr && this->preset_4_height_sensor_->state != preset_height) {
+          this->preset_4_height_sensor_->publish_state(preset_height);
+          ESP_LOGV(TAG, "Setting Preset_4 to: %f", preset_height);
+        }
       } else {
         ESP_LOGV(TAG, "Cannot set preset_4 yet. units: %s, sys_limit_min_height: %f",
                  this->units_select_->state.c_str(), this->sys_limit_min_height_sensor_->get_state());
       }
       break;
     }
+    // TODO: add guards that don't change value if they don't need to be changed.. (as with the height below)
+    // add also check if the sensor is even defined (nullptr check) and if the entity type is define (ifdef
+    // use_sensor, etc..)
+    // TODO: preset_x_height sensors depend on sys_limit_min and units
+    //       if those are not defined, then these sensors will just report NAN always
+    //       WE NEED TO ADD LOGIC HERE SO THAT preset_x_height ARE RELOADED, WHEN THE UNITS ARE CHANGED
     case IncomingCommandType::Units: {
       std::string units = UNITS_INT_TO_ENUM.at(msg.getParam<UnitsStructure>());
       this->units_select_->publish_state(units);
@@ -345,6 +369,9 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       ESP_LOGV(TAG, "Setting user_limit_max to: %d", user_limit_max);
       break;
     }
+    // TODO: preset_x_height sensors depend on sys_limit_min and units
+    //       if those are not defined, then these sensors will just report NAN always
+    //       WE NEED TO ADD LOGIC HERE SO THAT preset_x_height ARE RELOADED, WHEN THE UNITS ARE CHANGED
     case IncomingCommandType::AbsLimits: {
       uint8_t params[4];
       uint8_t paramSize;
@@ -361,6 +388,9 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
       break;
     }
     case IncomingCommandType::Height: {
+      // TODO: add conversion to inches, if it's set.. (I don't care, I use mm, which is what this reports by default..)
+      // TODO: add logic to also update the desk status text_sensor
+
       this->last_reported_height_ = msg.getParam<uint16_t>();
       if (this->height_number_ != nullptr &&
           (!this->height_number_->has_state() || this->height_number_->state != this->last_reported_height_)) {
@@ -387,11 +417,6 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
 void FullyJarvisFComponent::send_command_(const FullyJarvisFMessage &msg, uint8_t reps = 1) {
   ESP_LOGI(TAG, "Sending COMMAND: %s (%02x)", msg.getTypeStr().c_str(), msg.getType());
   ESP_LOGVV(TAG, "Sending COMMAND %s", msg.toString().c_str());
-
-  // if (msg == nullptr) {
-  //   ESP_LOGE(TAG, "Error: Message is null");
-  //   return;
-  // }
 
   if (msg.getSourceId() == SourceType::Incoming) {
     ESP_LOGE(TAG, "Error: Cannot send an incoming message!");
@@ -573,9 +598,9 @@ void FullyJarvisFComponent::set_min_height() {
   this->send_command_(FullyJarvisFMessage(OutgoingCommandType::SetMinHeight));
 
   // TODO: this might not be necessary here, if the reload/restart logic is sound..
-  if (this->user_limit_max_height_sensor_ != nullptr) {
-    if (!std::isnan(this->user_limit_max_height_sensor_->get_raw_state()))
-      this->user_limit_max_height_sensor_->publish_state(NAN);
+  if (this->user_limit_min_height_sensor_ != nullptr) {
+    if (!std::isnan(this->user_limit_min_height_sensor_->get_raw_state()))
+      this->user_limit_min_height_sensor_->publish_state(NAN);
   }
 
   if (this->user_limit_set_text_sensor_ != nullptr) {
@@ -609,9 +634,9 @@ void FullyJarvisFComponent::clear_min_height() {
   this->send_command_(FullyJarvisFMessage(OutgoingCommandType::ClearMinMax, static_cast<uint8_t>(0x02)));
 
   // TODO: this might not be necessary here, if the reload/restart logic is sound..
-  if (this->user_limit_max_height_sensor_ != nullptr) {
-    if (!std::isnan(this->user_limit_max_height_sensor_->get_state()))
-      this->user_limit_max_height_sensor_->publish_state(NAN);
+  if (this->user_limit_min_height_sensor_ != nullptr) {
+    if (!std::isnan(this->user_limit_min_height_sensor_->get_state()))
+      this->user_limit_min_height_sensor_->publish_state(NAN);
   }
 
   if (this->user_limit_set_text_sensor_ != nullptr) {

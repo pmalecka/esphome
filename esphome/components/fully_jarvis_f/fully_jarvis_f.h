@@ -165,6 +165,7 @@ class FullyJarvisFComponent : public Component, public uart::UARTDevice {
   SUB_BUTTON(set_min_height)
   SUB_BUTTON(clear_max_height)
   SUB_BUTTON(clear_min_height)
+  SUB_BUTTON(restart)
 #endif
 #ifdef USE_NUMBER
   SUB_NUMBER(height)

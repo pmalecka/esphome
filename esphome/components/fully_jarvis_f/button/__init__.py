@@ -3,9 +3,11 @@ from esphome.components import button
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_ID,
+    CONF_RESTART,
     DEVICE_CLASS_RESTART,
     DEVICE_CLASS_UPDATE,
     ENTITY_CATEGORY_CONFIG,
+    ENTITY_CATEGORY_DIAGNOSTIC,
     ENTITY_CATEGORY_NONE,
     ICON_NEW_BOX,
     ICON_RESTART,
@@ -24,6 +26,8 @@ SetMinHeightButton = fully_jarvis_f_ns.class_("SetMinHeightButton", button.Butto
 
 ClearMaxHeightButton = fully_jarvis_f_ns.class_("ClearMaxHeightButton", button.Button)
 ClearMinHeightButton = fully_jarvis_f_ns.class_("ClearMinHeightButton", button.Button)
+
+RestartButton = fully_jarvis_f_ns.class_("RestartButton", button.Button)
 
 CONF_GO_PRESET_1 = "go_preset_1"
 CONF_GO_PRESET_2 = "go_preset_2"
@@ -107,6 +111,12 @@ CONFIG_SCHEMA = {
         entity_category=ENTITY_CATEGORY_CONFIG,
         icon=ICON_RESTART,
     ),
+    cv.Optional(CONF_RESTART): button.button_schema(
+        RestartButton,
+        device_class=DEVICE_CLASS_RESTART,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        icon=ICON_RESTART,
+    ),
 }
 
 
@@ -126,48 +136,6 @@ async def to_code(config):
             await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
             cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
 
-    # if go_preset_1_config := config.get(CONF_GO_PRESET_1):
-    #     preset_num = 1
-    #     b = await button.new_button(go_preset_1_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    # if go_preset_2_config := config.get(CONF_GO_PRESET_2):
-    #     preset_num = 2
-    #     b = await button.new_button(go_preset_2_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    # if go_preset_3_config := config.get(CONF_GO_PRESET_3):
-    #     preset_num = 3
-    #     b = await button.new_button(go_preset_3_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-    # if go_preset_4_config := config.get(CONF_GO_PRESET_4):
-    #     preset_num = 4
-    #     b = await button.new_button(go_preset_4_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_go_preset_button(preset_num, b))
-
-    # if set_preset_1_config := config.get(CONF_SET_PRESET_1):
-    #     preset_num = 1
-    #     b = await button.new_button(set_preset_1_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    # if set_preset_2_config := config.get(CONF_SET_PRESET_2):
-    #     preset_num = 2
-    #     b = await button.new_button(set_preset_2_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    # if set_preset_3_config := config.get(CONF_SET_PRESET_3):
-    #     preset_num = 3
-    #     b = await button.new_button(set_preset_3_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-    # if set_preset_4_config := config.get(CONF_SET_PRESET_4):
-    #     preset_num = 4
-    #     b = await button.new_button(set_preset_4_config)
-    #     await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
-    #     cg.add(fully_jarvis_f_component.set_set_preset_button(preset_num, b))
-
     if set_max_height_config := config.get(CONF_SET_MAX_HEIGHT):
         b = await button.new_button(set_max_height_config)
         await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
@@ -185,3 +153,7 @@ async def to_code(config):
         b = await button.new_button(clear_min_height_config)
         await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
         cg.add(fully_jarvis_f_component.set_clear_min_height_button(b))
+    if restart_config := config.get(CONF_RESTART):
+        b = await button.new_button(restart_config)
+        await cg.register_parented(b, config[CONF_FULLY_JARVIS_F_ID])
+        cg.add(fully_jarvis_f_component.set_restart_button(b))
