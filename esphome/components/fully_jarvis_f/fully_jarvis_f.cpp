@@ -395,6 +395,10 @@ void FullyJarvisFComponent::handle_incoming_data_(const FullyJarvisFMessage &msg
 
       this->sys_limit_max_height_sensor_->publish_state(sys_limit_max);
       this->sys_limit_min_height_sensor_->publish_state(sys_limit_min);
+
+      // also set min and max for the height sensor (ignore the user limits for now..)
+      this->height_number_->traits.set_min_value(sys_limit_min);
+      this->height_number_->traits.set_min_value(sys_limit_max);
       ESP_LOGV(TAG, "Setting sys_limit_max to: %d", sys_limit_max);
       ESP_LOGV(TAG, "Setting sys_limit_min to: %d", sys_limit_min);
       break;
